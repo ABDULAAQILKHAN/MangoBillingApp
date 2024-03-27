@@ -1,33 +1,12 @@
 {
   "expo": {
-    "name": "Mango billing App",
-    "slug": "Mango billing App",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/image.png",
-    "splash": {
-      "image": "./assets/image.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "package":"com.github.sanketscode.DS_Supplier_App",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/image.png",
-        "backgroundColor": "#FFFFFF"
+    "extra": {
+      "eas": {
+        "projectId": "3d91052c-4254-420d-9b5a-9414356460a2"
       }
     },
-    "web": {
-      "favicon": "./assets/image.png"
+    "android": {
+      "package": "com.aaqil_khan.mangobillgenerator"
     }
   }
 }

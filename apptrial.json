@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Mango billing App",
+    "slug": "Mango_billing_App",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/image.png",
+    "splash": {
+      "image": "./assets/image.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "https://github.com/ABDULAAQILKHAN/MangoBillingApp.git",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/image.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/image.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4dcca8ae-bdfa-4e41-b009-31bfd90ce758"
+      }
+    }
+  }
+}

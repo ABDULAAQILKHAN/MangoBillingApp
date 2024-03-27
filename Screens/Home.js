@@ -17,16 +17,9 @@ import {PdfCode} from "../Component/PdfCode";
 
 const Home = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [name, set_Name] = useState("");
-  const [Address, Set_Address] = useState("");
-  const [Mobile_No, Set_Mobile_No] = useState("");
   const [itemType, setItemType] = useState("")
-  const [lot, setLot] = useState();
-  const [bags, setBags] = useState();
-  const [grossWT, setGrossWT] = useState();
-  const [netWt, setNetWt] = useState();
-  const [rate, setRate] = useState();
-  const [per, setPer] = useState("KG");
+  const [totalLot, setTotalLot] = useState();
+
   const [amount, setAmount] = useState();
   const [temp, setTemp] = useState([])
   const [item, setItem] = useState({
@@ -39,6 +32,17 @@ const Home = ({ navigation }) => {
     per : "KG",
     amount: ""
   })
+  useEffect(()=>{
+    let lots_array = temp.map(item=>{
+      return item.lot;
+    })
+    let sum = 0;
+    console.log(lots_array)
+    lots_array.map(item=>{
+      sum = eval(`${sum} + ${item}`)
+    })
+    setTotalLot(sum)
+  },[temp])
   useEffect(()=>{
     setItem({...item,type: itemType})
   },[itemType])
@@ -79,9 +83,6 @@ features for ios
     })
   }
   const allReset = ()=>{
-    set_Name("")
-    Set_Address("")
-    Set_Mobile_No("")
     setAllData({...allData,name : "",Address: "",Mobile_No: "",Items: temp})
   }
   const handleCreateInvoice = () =>{
