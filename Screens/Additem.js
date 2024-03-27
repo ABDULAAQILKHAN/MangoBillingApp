@@ -16,7 +16,7 @@ import { shareAsync } from 'expo-sharing';
 import {PdfCode} from "../Component/PdfCode";
 import * as React from 'react';
 
-const CreateBill = ({navigation, route}) => {
+const AddItem = ({navigation, route}) => {
   const [Quantity,setQuantity] = useState('');
   const now = new Date();
   const [Invoice,setInvoice] = useState(dateFormat(now, "ddmmyyhhMss")) 
@@ -232,4 +232,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default CreateBill;
+export default AddItem;

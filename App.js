@@ -11,7 +11,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-        <Stack.Screen name="CreateBill" component={CreateBill} />
+        <Stack.Screen name="Add Item" component={CreateBill} />
       </Stack.Navigator>
     </NavigationContainer>
   );

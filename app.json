@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "DS Supplier App",
-    "slug": "DS_Supplier_App",
+    "name": "Mango billing App",
+    "slug": "Mango billing App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/image.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/image.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,12 +22,12 @@
     "android": {
       "package":"com.github.sanketscode.DS_Supplier_App",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/image.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/image.png"
     }
   }
 }
