@@ -4,10 +4,10 @@
     "slug": "invoiceBuilder",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/image.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/image.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,12 +19,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/image.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.aaqil_khan.invoiceBuilder"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/image.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ec7b3808-428d-4022-8ed7-3fc7fadcd904"
+      }
     }
   }
 }
