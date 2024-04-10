@@ -14,14 +14,18 @@ import {Picker} from "@react-native-picker/picker";
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
 import {PdfCode} from "../Component/PdfCode";
-
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Dialog from "react-native-dialog";
 const Home = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [confirmDialogeVisible, setconfirmDialogeVisible] = useState(false)
+  const [confirmAllresetVisible, setconfirmAllresetVisible] = useState(false)
+  const [deleteItemConfirm, setdeleteItemConfirm] = useState(false)
+  const [itemToDelete,setItemToDelete] = useState("");
   const [itemType, setItemType] = useState("")
   const [totalLot, setTotalLot] = useState();
   const [selected,setSelected] = useState([])
-  const [badam, setBadam] = useState([false])
-  const [amount, setAmount] = useState();
+
   const [temp, setTemp] = useState([])
   const [item, setItem] = useState({
     type: "",
@@ -87,22 +91,46 @@ features for ios
     })
   }
   const allReset = ()=>{
-    setAllData({...allData,name : "",Address: "",Mobile_No: "",Items: temp})
+    setAllData({...allData,name : "",Address: "",Mobile_No: "",Items: []})
     setSelected([])
+    setconfirmAllresetVisible(false)
   }
-  const removeItem = (type)=>{
+  function removeElement(array, element) {
+    const index = array.indexOf(element);
+    if (index !== -1) {
+        array.splice(index, 1);
+    }
+    return array;
+}
 
-    let temp = allData.Items;
-    console.log("before",allData.Items)
-    temp.map((item,index)=>{
-      if(item.type === type){
-        temp = temp.splice(index,1)
+  useEffect(()=>{
+    if(deleteItemConfirm){
+      let type = itemToDelete;
+      setconfirmDialogeVisible(false)
+      let temp = allData.Items;
+      //console.log("before",allData.Items)
+      temp.map((item,index)=>{
+      if(item.type===type){
+        temp.splice(index,1)
       }
     })
-    console.log("after",temp)
-    temp = []
-    //setAllData({...allData,Items: temp});
+    //console.log("after",temp)
+    setAllData({...allData,Items: temp});
+    let newSelected = removeElement(selected,type);
+    setSelected(newSelected)
   }
+    
+  },[deleteItemConfirm]);
+
+
+  const removeItem = (type)=>{
+    if(!selected.includes(type)){
+      alert("Select item!")
+    }else{
+      setconfirmDialogeVisible(true)
+      setItemToDelete(type)
+    }
+    }
 
   const handleCreateInvoice = () =>{
     let data = ""
@@ -171,7 +199,7 @@ features for ios
     return ( <>
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent={false}
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(!modalVisible);
@@ -179,7 +207,7 @@ features for ios
       >
 
         <SafeAreaView style={styles.containerModal}>
-          <ScrollView contentContainerStyle={styles.scrollViewModal}>
+          <ScrollView>
 
         <View style={{
 
@@ -196,16 +224,16 @@ features for ios
               width: "100%",
               overflow: "hidden",
               borderBottomWidth: 2,
-              height: "5%",
+              height: "auto",
               alignItems: "center",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center"
             }}>
-              <Text style={{fontSize: 20}}>{itemType} | Enter Details</Text>
+              <Text style={{fontSize: 20,padding:10}}>{itemType} | Enter Details</Text>
             </View>
             <View style={{
-              marginTop: 15,
+              marginTop: 5,
               alignSelf: "center",
               width: "100%"
             }}>
@@ -274,15 +302,7 @@ features for ios
                   </Picker>
                 </View>
               </View>        
-              {
-                /**
-                 * 
-              <KeyboardAvoidingView 
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{flex: 1,}}>
-                </KeyboardAvoidingView>
-                 */
-              }
+
               <View style={styles.InputContainer}>
                 <Text>Amount</Text>
                 <TextInput
@@ -300,11 +320,13 @@ features for ios
             }
             <View style={styles.EndBottons}>
               <Button 
+              color={"red"}
               title="Reset"
               onPress={ResetDetails}
               />
 
               <Button 
+              color={"green"}
               title="Add item"
               onPress={handleAddItem}
               />
@@ -315,9 +337,51 @@ features for ios
     </SafeAreaView>
       </Modal>
 
+{
+  //confirm dialog box for item delete
+}
+
+      <View>
+        <Dialog.Container visible={confirmDialogeVisible}>
+          <Dialog.Title>Confirm</Dialog.Title>
+          <Dialog.Description>
+            {`Do you want to remove ${itemToDelete}?`}
+          </Dialog.Description>
+          <Dialog.Button label="NO" 
+            bold={true}
+            onPress={()=>setconfirmDialogeVisible(false)}/>
+          <Dialog.Button label="Yes" 
+            color={"red"}
+            bold={true}
+            onPress={()=>setdeleteItemConfirm(true)} />
+        </Dialog.Container>
+      </View>
+{
+  //confirm dialog box for all reset
+}
+
+      <View>
+        <Dialog.Container visible={confirmAllresetVisible}>
+          <Dialog.Title>Confirm</Dialog.Title>
+          <Dialog.Description>
+            {`Do you want to Reset all!`}
+          </Dialog.Description>
+          <Dialog.Button label="Cancel" 
+            bold={true}
+            onPress={()=>setconfirmAllresetVisible(false)}/>
+          <Dialog.Button label="Reset" 
+            color={"red"}
+            bold={true}
+            onPress={()=>allReset()} />
+        </Dialog.Container>
+      </View>
+
+
 
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollView}
+          >
 
           <Text style={{fontSize:25,textDecorationLine: "underline",textDecorationStyle: "solid",alignSelf: "center",marginTop: 10}}>Create New Bill</Text>
          <View style={styles.InputContainer}>
@@ -352,35 +416,38 @@ features for ios
         </View>
           <Text style={{fontSize: 25,textDecorationLine: "underline",margin: 10,alignSelf: "center"}}>Select Mango type</Text>
               <View
-                style={[styles.button,{backgroundColor: selected.includes("badam")?"lightgreen":"lightblue"}]}
+                style={[styles.button,{backgroundColor: selected.includes("Badam")?"lightgreen":"lightgrey"}]}
               >
                 <View style={styles.buttonOuter}>
                   <View style={styles.buttonInner}>
                     <Pressable 
-                      //</View>onPress={() => navigation.navigate('Add Item', {type:"badam"})}
-                      onPress={()=>{
+                    style={{width: "95%"}}
+                    onPress={()=>{
                         setModalVisible(true)
-                        setItemType("badam")
+                        setItemType("Badam")
                       }}
                       >
                     <Text style={{fontSize: 18}}>Badam</Text>
                     </Pressable>
                     <Pressable 
-                      onPress={()=>removeItem("badam")}>
-                      <Text style={styles.cross}>X</Text>
+                      onPress={()=>removeItem("Badam")}>
+                      <Text style={styles.cross}>
+                      <Icon name="delete" size={28} color={"red"} />
+                      </Text>
                     </Pressable>
                   </View>
 
                 </View>
               </View>
               <View
-                style={[styles.button,{backgroundColor:  selected.includes("Laal bahar")?"lightgreen":"lightblue"}]}
+                style={[styles.button,{backgroundColor:  selected.includes("Laal bahar")?"lightgreen":"lightgrey"}]}
 
               >
                 <View style={styles.buttonOuter}>
                   <View style={styles.buttonInner}>
                     <Pressable 
-                      onPress={()=>{
+                    style={{width: "95%"}}
+                    onPress={()=>{
                         setModalVisible(true)
                         setItemType("Laal bahar")
                       }}
@@ -389,19 +456,22 @@ features for ios
                     </Pressable>
                     <Pressable 
                       onPress={()=>removeItem("Laal bahar")}>
-                      <Text style={styles.cross}>X</Text>
+                      <Text style={styles.cross}>
+                      <Icon name="delete" size={28} color={"red"} />
+                      </Text>
                     </Pressable>
                   </View>
 
                 </View>
               </View>
               <View
-                style={[styles.button,{backgroundColor:  selected.includes("Tota pari")?"lightgreen":"lightblue"}]}
+                style={[styles.button,{backgroundColor:  selected.includes("Tota pari")?"lightgreen":"lightgrey"}]}
                 >
                 <View style={styles.buttonOuter}>
                   <View style={styles.buttonInner}>
                     <Pressable 
-                      onPress={()=>{
+                    style={{width: "95%"}}
+                    onPress={()=>{
                         setModalVisible(true)
                         setItemType("Tota pari")
                       }}>
@@ -409,20 +479,23 @@ features for ios
                     </Pressable>
                     <Pressable 
                       onPress={()=>removeItem("Tota pari")}>
-                      <Text style={styles.cross}>X</Text>
+                      <Text style={styles.cross}>
+                      <Icon name="delete" size={28} color={"red"} />
+                      </Text>
                     </Pressable>
                   </View>
 
                 </View>
               </View>
               <View
-                style={[styles.button,{backgroundColor:  selected.includes("Haffus")?"lightgreen":"lightblue"}]}
+                style={[styles.button,{backgroundColor:  selected.includes("Haffus")?"lightgreen":"lightgrey"}]}
 
               >
                 <View style={styles.buttonOuter}>
                   <View style={styles.buttonInner}>
                     <Pressable 
-                      onPress={()=>{
+                    style={{width: "95%"}}
+                    onPress={()=>{
                         setModalVisible(true)
                         setItemType("Haffus")
                       }}
@@ -431,18 +504,22 @@ features for ios
                     </Pressable>
                     <Pressable 
                       onPress={()=>removeItem("Haffus")}>
-                      <Text style={styles.cross}>X</Text>
+                      <Text style={styles.cross}>
+                      <Icon name="delete" size={28} color={"red"} />
+                      </Text>
                     </Pressable>
                   </View>
 
                 </View>
+
               </View>
               <View
-                style={[styles.button,{backgroundColor:  selected.includes("Nilam")?"lightgreen":"lightblue"}]}
+                style={[styles.button,{backgroundColor:  selected.includes("Nilam")?"lightgreen":"lightgrey"}]}
               >
                 <View style={styles.buttonOuter}>
                   <View style={styles.buttonInner}>
                     <Pressable
+                      style={{width: "95%"}}
                       onPress={()=>{
                       setModalVisible(true)
                       setItemType("Nilam")
@@ -452,18 +529,21 @@ features for ios
                     </Pressable>
                     <Pressable 
                       onPress={()=>removeItem("Nilam")}>
-                      <Text style={styles.cross}>X</Text>
+                      <Text style={styles.cross}>
+                      <Icon name="delete" size={28} color={"red"} />
+                      </Text>
                     </Pressable>
                   </View>
 
                 </View>
               </View>
               <View
-                style={[styles.button,{backgroundColor:  selected.includes("Daseri")?"lightgreen":"lightblue"}]}
+                style={[styles.button,{backgroundColor:  selected.includes("Daseri")?"lightgreen":"lightgrey"}]}
               >
                 <View style={styles.buttonOuter}>
                   <View style={styles.buttonInner}>
                     <Pressable
+                        style={{width: "95%"}}
                         onPress={()=>{
                         setModalVisible(true)
                         setItemType("Daseri")
@@ -473,7 +553,9 @@ features for ios
                     </Pressable>
                     <Pressable 
                       onPress={()=>removeItem("Daseri")}>
-                      <Text style={styles.cross}>X</Text>
+                      <Text style={styles.cross}>
+                      <Icon name="delete" size={28} color={"red"} />
+                      </Text>
                     </Pressable>
                   </View>
 
@@ -483,11 +565,16 @@ features for ios
         <View style={styles.EndBottons}>
           <Button 
           title="Reset"
-          onPress={allReset}
+          color={"red"}
+          onPress={()=>{
+            !allData.name || !allData.Address || !allData.Mobile_No ||
+            selected.length < 1 ? alert("Form is Empty!"):
+            setconfirmAllresetVisible(true)}}
           />
 
           <Button 
           title="Create Invoice"
+          color={"green"}
           onPress={handleCreateInvoice}
           //onPress={printToFile}
           />
@@ -507,12 +594,7 @@ const styles = StyleSheet.create({
       backgroundColor: "#F5F5F5",
     },
     scrollView: {
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-    },
-    scrollViewModal: {
+      paddingTop: "5%"
     },
     EndBottons : {
       margin: 20,
@@ -551,11 +633,11 @@ const styles = StyleSheet.create({
       width: "100%",
       display: "flex",
       flexDirection: "row",
-      justifyContent: "space-between"
+      justifyContent: "space-between",
     },
     cross: {
       fontSize: 18,
-      backgroundColor: "grey",
+      backgroundColor: "transparent",
       height: 30,
       width: 30,
       textAlign: "center",
