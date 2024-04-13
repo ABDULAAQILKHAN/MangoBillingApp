@@ -3,16 +3,18 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./Screens/Home";
 import CreateBill from "./Screens/CreateBill";
-
+import { StatusBar } from 'expo-status-bar';
 const Stack = createNativeStackNavigator();
 export default function App() {
-  return (
+  return (<>
+    <StatusBar translucent={false} style="dark" backgroundColor="#F5F5F5"/>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Stack.Screen name="Add Item" component={CreateBill} />
       </Stack.Navigator>
     </NavigationContainer>
+    </>
   );
 
 //java -jar bundletool-all-1.15.6.jar build-apks --bundle=app.aab --output=invoice.apks --mode=universal

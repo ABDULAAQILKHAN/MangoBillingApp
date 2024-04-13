@@ -20,13 +20,14 @@ const Home = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmDialogeVisible, setconfirmDialogeVisible] = useState(false)
   const [confirmAllresetVisible, setconfirmAllresetVisible] = useState(false)
+  const [confirmitemresetVisible, setconfirmitemresetVisible] = useState(false)
   const [deleteItemConfirm, setdeleteItemConfirm] = useState(false)
   const [itemToDelete,setItemToDelete] = useState("");
   const [itemType, setItemType] = useState("")
   const [totalLot, setTotalLot] = useState();
   const [selected,setSelected] = useState([])
-
   const [temp, setTemp] = useState([])
+  const [allDetailsFlag, setAlldetailsFlag] = useState(false)
   const [item, setItem] = useState({
     type: "",
     lot : "",
@@ -37,7 +38,26 @@ const Home = ({ navigation }) => {
     per : "KG",
     amount: ""
   })
-  
+  /*
+  */
+  useEffect(()=>{
+    if(item.netWt && item.rate && !item.amount){
+      let amt = eval(`${item.netWt} * ${item.rate}`).toString();
+      setItem({...item,amount: amt})
+    }
+    if(item.type &&
+      item.lot &&
+      item.bags &&
+      item.grossWT &&
+      item.netWt &&
+      item.rate &&
+      item.per &&
+      item.amount){
+        setAlldetailsFlag(true)
+      }else{
+        setAlldetailsFlag(false)
+      }
+  },[item])
   const [allData, setAllData] = useState({
     name: "",
     Address: "",
@@ -49,7 +69,7 @@ const Home = ({ navigation }) => {
       return item.lot;
     })
     let sum = 0;
-    console.log(lots_array)
+    //console.log(lots_array)
     lots_array.map(item=>{
       sum = eval(`${sum} + ${item}`)
     })
@@ -89,11 +109,23 @@ features for ios
       per : "KG",
       amount: ""
     })
+    setconfirmitemresetVisible(false)
+
   }
   const allReset = ()=>{
     setAllData({...allData,name : "",Address: "",Mobile_No: "",Items: []})
     setSelected([])
     setconfirmAllresetVisible(false)
+    setItem({...item,
+      type: "",
+      lot : "",
+      bags: "",
+      grossWT : "",
+      netWt : "",
+      rate : "",
+      per : "KG",
+      amount: ""
+    })
   }
   function removeElement(array, element) {
     const index = array.indexOf(element);
@@ -104,22 +136,21 @@ features for ios
 }
 
   useEffect(()=>{
+    //console.log("clicked")
     if(deleteItemConfirm){
-      let type = itemToDelete;
-      setconfirmDialogeVisible(false)
       let temp = allData.Items;
-      //console.log("before",allData.Items)
       temp.map((item,index)=>{
-      if(item.type===type){
-        temp.splice(index,1)
-      }
-    })
-    //console.log("after",temp)
-    setAllData({...allData,Items: temp});
-    let newSelected = removeElement(selected,type);
-    setSelected(newSelected)
+        if(item.type===itemToDelete){
+          temp.splice(index,1)
+        }
+      })
+      setAllData({...allData,Items: temp});
+      setSelected(prev=>removeElement(prev,itemToDelete))
+      setconfirmDialogeVisible(false)
+      setdeleteItemConfirm(false)
+  }else{
+    console.log(false)
   }
-    
   },[deleteItemConfirm]);
 
 
@@ -158,17 +189,45 @@ features for ios
     setAllData({...allData,Items: temp});
   },[temp])
 
-
-
   const handleAddItem = ()=>{
+   
     setTemp(prev=>[...prev,item]);
-    ResetDetails();
+    if(selected.includes(item.type)){
+      let toOp = temp;
+
+      temp.map((data,index)=>{
+        if(data.type === item.type){
+          toOp[index] = item;
+          setTemp(toOp);
+        }
+      })
+    }
     setSelected(prev=>[...prev,item.type])
+    setItemType("")
+    ResetDetails();
     setModalVisible(false);
   }
   useEffect(()=>{
-    //alert(selected)
-  },[selected])
+    if(itemType){
+      if(selected.includes(itemType)){
+        allData.Items.map((item,index)=>{
+          if(item.type === itemType){
+            let temp = allData.Items[index];
+                setItem({...item,
+                  type: temp.type ? temp.type : "",
+                  lot: temp.lot ? temp.lot : "",
+                  bags: temp.bags ? temp.bags : "",
+                  grossWT: temp.grossWT ? temp.grossWT : "",
+                  netWt: temp.netWt ? temp.netWt : "",
+                  rate: temp.rate ? temp.rate : "",
+                  per: temp.per ? temp.per : "",
+                  amount: temp.amount ? temp.amount : ""
+                })
+          }
+        })
+      }
+    }
+  },[itemType])
   const printToFile = async (data) => {
 
 
@@ -202,10 +261,31 @@ features for ios
         transparent={false}
         visible={modalVisible}
         onRequestClose={() => {
+          ResetDetails();
           setModalVisible(!modalVisible);
+          if(!allDetailsFlag){
+            //alert("blank")
+            //setSelected(prev=>removeElement(prev,itemType))
+            //setconfirmitemresetVisible(true)
+            //setdeleteItemConfirm(true)
+            //setItemToDelete(itemType)
+          }
+
         }}
       >
 
+            <View style={{
+              width: "100%",
+              overflow: "hidden",
+              borderBottomWidth: 2,
+              height: "auto",
+              alignItems: "center",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center"
+            }}>
+              <Text style={{fontSize: 20,padding:10}}>{itemType} | Enter Details</Text>
+            </View>
         <SafeAreaView style={styles.containerModal}>
           <ScrollView>
 
@@ -220,18 +300,6 @@ features for ios
           justifyContent: "flex-start"
         }}>
 
-            <View style={{
-              width: "100%",
-              overflow: "hidden",
-              borderBottomWidth: 2,
-              height: "auto",
-              alignItems: "center",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center"
-            }}>
-              <Text style={{fontSize: 20,padding:10}}>{itemType} | Enter Details</Text>
-            </View>
             <View style={{
               marginTop: 5,
               alignSelf: "center",
@@ -315,6 +383,10 @@ features for ios
               </View>
 
             </View>
+        </View>
+
+        </ScrollView>
+    </SafeAreaView>
             {
               //end button view
             }
@@ -322,7 +394,7 @@ features for ios
               <Button 
               color={"red"}
               title="Reset"
-              onPress={ResetDetails}
+              onPress={()=>setconfirmitemresetVisible(true)}
               />
 
               <Button 
@@ -331,10 +403,6 @@ features for ios
               onPress={handleAddItem}
               />
             </View>
-        </View>
-
-        </ScrollView>
-    </SafeAreaView>
       </Modal>
 
 {
@@ -349,7 +417,9 @@ features for ios
           </Dialog.Description>
           <Dialog.Button label="NO" 
             bold={true}
-            onPress={()=>setconfirmDialogeVisible(false)}/>
+            onPress={()=>{
+              setItemToDelete("")
+              setconfirmDialogeVisible(false)}}/>
           <Dialog.Button label="Yes" 
             color={"red"}
             bold={true}
@@ -372,18 +442,36 @@ features for ios
           <Dialog.Button label="Reset" 
             color={"red"}
             bold={true}
-            onPress={()=>allReset()} />
+            onPress={allReset} />
+        </Dialog.Container>
+      </View>
+      {
+  //confirm dialog box for item reset
+}
+
+      <View>
+        <Dialog.Container visible={confirmitemresetVisible}>
+          <Dialog.Title>Confirm</Dialog.Title>
+          <Dialog.Description>
+            {`Do you want to clear details!`}
+          </Dialog.Description>
+          <Dialog.Button label="back" 
+            bold={true}
+            onPress={()=>setconfirmitemresetVisible(false)}/>
+          <Dialog.Button label="Clear" 
+            color={"red"}
+            bold={true}
+            onPress={ResetDetails} />
         </Dialog.Container>
       </View>
 
 
-
+        <Text style={{fontSize:25,textDecorationLine: "underline",textDecorationStyle: "solid",alignSelf: "center",padding: 2}}>Create New Bill</Text>
       <SafeAreaView style={styles.container}>
         <ScrollView 
           contentContainerStyle={styles.scrollView}
           >
 
-          <Text style={{fontSize:25,textDecorationLine: "underline",textDecorationStyle: "solid",alignSelf: "center",marginTop: 10}}>Create New Bill</Text>
          <View style={styles.InputContainer}>
           <Text>Name :</Text>
           <TextInput
@@ -562,13 +650,13 @@ features for ios
                 </View>
               </View>
 
+        </ScrollView>
+    </SafeAreaView>
         <View style={styles.EndBottons}>
           <Button 
           title="Reset"
           color={"red"}
-          onPress={()=>{
-            !allData.name || !allData.Address || !allData.Mobile_No ||
-            selected.length < 1 ? alert("Form is Empty!"):
+          onPress={()=>{           
             setconfirmAllresetVisible(true)}}
           />
 
@@ -579,8 +667,6 @@ features for ios
           //onPress={printToFile}
           />
         </View>
-        </ScrollView>
-    </SafeAreaView>
     </>);
 }
 
@@ -597,11 +683,13 @@ const styles = StyleSheet.create({
       paddingTop: "5%"
     },
     EndBottons : {
-      margin: 20,
-      width: "90%",
+      padding: 15,
+      width: "100%",
+      height: 'auto',
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
+      alignSelf: "center"
     },
     tinyLogo : {
       width : 100,
